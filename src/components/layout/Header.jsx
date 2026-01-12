@@ -1,5 +1,6 @@
 import { Link, useNavigate } from "react-router-dom"
 import { useAuth } from "@/hooks/useAuth"
+import { useTheme } from "@/hooks/useTheme"
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -9,10 +10,11 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { History, LogOut, User, Calculator } from "lucide-react"
+import { History, LogOut, User, Calculator, Moon, Sun } from "lucide-react"
 
 export function Header() {
   const { user, logout } = useAuth()
+  const { theme, toggleTheme } = useTheme()
   const navigate = useNavigate()
 
   const handleLogout = async () => {
@@ -34,6 +36,19 @@ export function Header() {
               <History className="h-4 w-4 mr-2" />
               History
             </Link>
+          </Button>
+
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={toggleTheme}
+            aria-label="Toggle theme"
+          >
+            {theme === "dark" ? (
+              <Sun className="h-5 w-5" />
+            ) : (
+              <Moon className="h-5 w-5" />
+            )}
           </Button>
 
           <DropdownMenu>

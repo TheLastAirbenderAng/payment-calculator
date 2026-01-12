@@ -5,6 +5,7 @@ import {
   getDoc,
   doc,
   deleteDoc,
+  updateDoc,
   query,
   orderBy,
   serverTimestamp,
@@ -52,4 +53,10 @@ export async function getEntry(userId, entryId) {
 export async function deleteEntry(userId, entryId) {
   const docRef = doc(db, "users", userId, "entries", entryId)
   await deleteDoc(docRef)
+}
+
+// Update entry paid status
+export async function updateEntryPaidStatus(userId, entryId, isPaid) {
+  const docRef = doc(db, "users", userId, "entries", entryId)
+  await updateDoc(docRef, { isPaid })
 }

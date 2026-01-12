@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react"
 import { useParams, useNavigate, Link } from "react-router-dom"
 import { useAuth } from "@/hooks/useAuth"
-import { getEntry, deleteEntry } from "@/lib/firestore"
+import { getEntry, deleteEntry, updateEntryPaidStatus } from "@/lib/firestore"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { Skeleton } from "@/components/ui/skeleton"
 import {
@@ -15,7 +16,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { formatCurrency, formatDate } from "@/lib/utils"
-import { ArrowLeft, Trash2, Loader2, AlertTriangle } from "lucide-react"
+import { ArrowLeft, Trash2, Loader2, AlertTriangle, Check, Circle } from "lucide-react"
 import { toast } from "sonner"
 
 export default function HistoryDetail() {
@@ -28,6 +29,7 @@ export default function HistoryDetail() {
   const [error, setError] = useState(null)
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
   const [deleting, setDeleting] = useState(false)
+  const [updatingPaidStatus, setUpdatingPaidStatus] = useState(false)
 
   useEffect(() => {
     const fetchEntry = async () => {
@@ -61,6 +63,22 @@ export default function HistoryDetail() {
     } finally {
       setDeleting(false)
       setShowDeleteDialog(false)
+    }
+  }
+
+  const handleTogglePaidStatus = async () => {
+    if (!entry) return
+    setUpdatingPaidStatus(true)
+    const newStatus = !entry.isPaid
+    try {
+      await updateEntryPaidStatus(user.uid, id, newStatus)
+      setEntry({ ...entry, isPaid: newStatus })
+      toast.success(newStatus ? "Marked as paid" : "Marked as unpaid")
+    } catch (err) {
+      console.error("Error updating paid status:", err)
+      toast.error("Failed to update status")
+    } finally {
+      setUpdatingPaidStatus(false)
     }
   }
 
@@ -138,10 +156,24 @@ export default function HistoryDetail() {
         {!loading && !error && entry && (
           <Card>
             <CardHeader>
-              <CardTitle>{entry.situation}</CardTitle>
-              <p className="text-sm text-muted-foreground">
-                Paid by {entry.payerName}
-              </p>
+              <div className="flex items-start justify-between">
+                <div>
+                  <CardTitle>{entry.situation}</CardTitle>
+                  <p className="text-sm text-muted-foreground">
+                    Paid by {entry.payerName}
+                  </p>
+                </div>
+                <Badge variant={entry.isPaid ? "success" : "secondary"}>
+                  {entry.isPaid ? (
+                    <>
+                      <Check className="h-3 w-3 mr-1" />
+                      Paid
+                    </>
+                  ) : (
+                    "Unpaid"
+                  )}
+                </Badge>
+              </div>
             </CardHeader>
             <CardContent className="space-y-6">
               {/* Items */}
@@ -208,12 +240,39 @@ export default function HistoryDetail() {
               <div className="flex justify-between items-center">
                 <span className="text-lg font-semibold">Total Paid</span>
                 <div className="text-right">
-                  <span className="text-2xl font-bold text-primary">
+                  <span className={`text-2xl font-bold ${entry.isPaid ? "text-muted-foreground line-through" : "text-primary"}`}>
                     {formatCurrency(entry.calculatedTotal, entry.currency)}
                   </span>
                   <p className="text-xs text-muted-foreground">{entry.currency}</p>
                 </div>
               </div>
+
+              <Separator />
+
+              {/* Mark as Paid Button */}
+              <Button
+                variant={entry.isPaid ? "outline" : "default"}
+                className="w-full"
+                onClick={handleTogglePaidStatus}
+                disabled={updatingPaidStatus}
+              >
+                {updatingPaidStatus ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                    Updating...
+                  </>
+                ) : entry.isPaid ? (
+                  <>
+                    <Circle className="h-4 w-4 mr-2" />
+                    Mark as Unpaid
+                  </>
+                ) : (
+                  <>
+                    <Check className="h-4 w-4 mr-2" />
+                    Mark as Paid
+                  </>
+                )}
+              </Button>
             </CardContent>
           </Card>
         )}
