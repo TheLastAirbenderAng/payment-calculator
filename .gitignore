@@ -29,3 +29,8 @@ npm-debug.log*
 # Private specs
 UTANG_TRACKER_SPEC.md
 *_SPEC.md
+
+# Test artifacts
+playwright-report/
+test-results/
+coverage/
