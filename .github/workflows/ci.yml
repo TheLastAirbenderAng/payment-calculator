@@ -1,10 +1,15 @@
 name: CI/CD Pipeline
 
+# Workflow Strategy:
+# - main branch: Run tests + deploy to GitHub Pages (production)
+# - Pull requests to main: Run tests only (no deploy)
+# - Feature branches: Use PRs to main for code review
+
 on:
   push:
-    branches: [production]
+    branches: [main]
   pull_request:
-    branches: [production]
+    branches: [main]
 
 jobs:
   test:
@@ -51,7 +56,8 @@ jobs:
     name: Deploy to GitHub Pages
     runs-on: ubuntu-latest
     needs: test
-    if: github.event_name == 'push'
+    # Only deploy on push to main (not on PRs)
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     
     permissions:
       contents: read
