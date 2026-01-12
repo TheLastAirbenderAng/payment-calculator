@@ -232,3 +232,138 @@ test.describe('Mark as Paid Feature - Visual Tests', () => {
     expect(hasLineThrough).toBe(true)
   })
 })
+
+test.describe('Guest Mode Feature', () => {
+  test('should have "Continue as Guest" button on login page', async ({ page }) => {
+    await page.goto('/')
+    await waitForApp(page)
+    
+    // Check for guest button
+    await expect(page.getByText('Continue as Guest')).toBeVisible({ timeout: 10000 })
+  })
+
+  test('should navigate to guest calculator when clicking guest button', async ({ page }) => {
+    await page.goto('/')
+    await waitForApp(page)
+    
+    // Click guest button
+    await page.getByText('Continue as Guest').click()
+    
+    // Should be on guest page
+    await expect(page).toHaveURL(/\/guest/)
+    
+    // Should see guest calculator elements
+    await expect(page.getByText('Quick Calculate')).toBeVisible({ timeout: 10000 })
+    await expect(page.getByText('Guest')).toBeVisible() // Guest badge
+  })
+
+  test('should show calculator without situation and payer fields', async ({ page }) => {
+    await page.goto('/')
+    await waitForApp(page)
+    
+    // Navigate to guest
+    await page.getByText('Continue as Guest').click()
+    await expect(page.getByText('Quick Calculate')).toBeVisible({ timeout: 10000 })
+    
+    // Should NOT have situation field
+    await expect(page.getByText("What's this for?")).not.toBeVisible()
+    
+    // Should NOT have payer field
+    await expect(page.getByText('Who paid?')).not.toBeVisible()
+    
+    // Should have items section
+    await expect(page.getByText('Items you owe')).toBeVisible()
+    
+    // Should have currency toggle
+    await expect(page.getByText('PHP')).toBeVisible()
+    await expect(page.getByText('USD')).toBeVisible()
+    
+    // Should have calculate button
+    await expect(page.getByRole('button', { name: /Calculate/i })).toBeVisible()
+  })
+
+  test('should be able to add items', async ({ page }) => {
+    await page.goto('/')
+    await waitForApp(page)
+    
+    // Navigate to guest
+    await page.getByText('Continue as Guest').click()
+    await expect(page.getByText('Quick Calculate')).toBeVisible({ timeout: 10000 })
+    
+    // Should have one item row initially
+    const itemInputs = page.locator('input[placeholder="Item name"]')
+    await expect(itemInputs).toHaveCount(1)
+    
+    // Click add item
+    await page.getByRole('button', { name: /Add Item/i }).click()
+    
+    // Should have two item rows now
+    await expect(itemInputs).toHaveCount(2)
+  })
+
+  test('should calculate total correctly', async ({ page }) => {
+    await page.goto('/')
+    await waitForApp(page)
+    
+    // Navigate to guest
+    await page.getByText('Continue as Guest').click()
+    await expect(page.getByText('Quick Calculate')).toBeVisible({ timeout: 10000 })
+    
+    // Fill in an item
+    await page.locator('input[placeholder="Item name"]').first().fill('Burger')
+    await page.locator('input[placeholder="Price"]').first().fill('150')
+    await page.locator('input[placeholder="Qty"]').first().fill('2')
+    
+    // Click calculate
+    await page.getByRole('button', { name: /Calculate/i }).click()
+    
+    // Modal should appear with total
+    await expect(page.getByText('Your Total')).toBeVisible({ timeout: 5000 })
+    
+    // Check for the calculated total in the bold primary text (150 * 2 = 300)
+    await expect(page.locator('.text-2xl.font-bold.text-primary')).toContainText('300')
+  })
+
+  test('should show error when calculating with no valid items', async ({ page }) => {
+    await page.goto('/')
+    await waitForApp(page)
+    
+    // Navigate to guest
+    await page.getByText('Continue as Guest').click()
+    await expect(page.getByText('Quick Calculate')).toBeVisible({ timeout: 10000 })
+    
+    // Click calculate without filling anything
+    await page.getByRole('button', { name: /Calculate/i }).click()
+    
+    // Should show error toast
+    await expect(page.getByText(/at least one item/i)).toBeVisible({ timeout: 5000 })
+  })
+
+  test('should have sign in link in guest mode', async ({ page }) => {
+    await page.goto('/')
+    await waitForApp(page)
+    
+    // Navigate to guest
+    await page.getByText('Continue as Guest').click()
+    await expect(page.getByText('Quick Calculate')).toBeVisible({ timeout: 10000 })
+    
+    // Should have sign in button in header
+    await expect(page.getByRole('link', { name: /Sign In/i })).toBeVisible()
+    
+    // Should have sign up prompt at bottom
+    await expect(page.getByText(/Create a free account/i)).toBeVisible()
+  })
+
+  test('guest calculator should work on mobile viewport', async ({ page }) => {
+    await page.setViewportSize({ width: 375, height: 667 })
+    await page.goto('/')
+    await waitForApp(page)
+    
+    // Navigate to guest
+    await page.getByText('Continue as Guest').click()
+    
+    // Core elements should be visible
+    await expect(page.getByText('Quick Calculate')).toBeVisible({ timeout: 10000 })
+    await expect(page.getByRole('button', { name: /Calculate/i })).toBeVisible()
+  })
+})

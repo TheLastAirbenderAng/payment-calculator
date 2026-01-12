@@ -1,12 +1,12 @@
 import { useState } from "react"
-import { useNavigate, Navigate } from "react-router-dom"
+import { useNavigate, Navigate, Link } from "react-router-dom"
 import { useAuth } from "@/hooks/useAuth"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
-import { Calculator, Loader2 } from "lucide-react"
+import { Calculator, Loader2, UserX } from "lucide-react"
 
 export default function Login() {
   const [isSignUp, setIsSignUp] = useState(false)
@@ -181,6 +181,25 @@ export default function Login() {
               />
             </svg>
             Continue with Google
+          </Button>
+
+          <div className="relative my-6">
+            <Separator />
+            <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-card px-2 text-xs text-muted-foreground">
+              or try without account
+            </span>
+          </div>
+
+          <Button
+            type="button"
+            variant="secondary"
+            className="w-full"
+            asChild
+          >
+            <Link to="/guest">
+              <UserX className="h-4 w-4 mr-2" />
+              Continue as Guest
+            </Link>
           </Button>
         </CardContent>
 

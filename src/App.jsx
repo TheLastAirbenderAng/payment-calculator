@@ -5,6 +5,7 @@ import { ProtectedRoute } from "@/components/layout/ProtectedRoute"
 import { Toaster } from "@/components/ui/sonner"
 import Login from "@/pages/Login"
 import Calculator from "@/pages/Calculator"
+import GuestCalculator from "@/pages/GuestCalculator"
 import History from "@/pages/History"
 import HistoryDetail from "@/pages/HistoryDetail"
 
@@ -15,6 +16,7 @@ function App() {
         <BrowserRouter basename="/payment-calculator">
           <Routes>
             <Route path="/login" element={<Login />} />
+            <Route path="/guest" element={<GuestCalculator />} />
             <Route
               path="/"
               element={
