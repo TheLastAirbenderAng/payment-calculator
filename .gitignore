@@ -25,3 +25,7 @@ npm-debug.log*
 
 # Vite cache
 .vite/
+
+# Private specs
+UTANG_TRACKER_SPEC.md
+*_SPEC.md
