@@ -196,7 +196,7 @@ export default function Login() {
             className="w-full"
             asChild
           >
-            <Link to="/guest">
+            <Link to="/guest" className="flex items-center justify-center">
               <UserX className="h-4 w-4 mr-2" />
               Continue as Guest
             </Link>

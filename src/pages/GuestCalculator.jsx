@@ -139,7 +139,7 @@ export default function GuestCalculator() {
             </Button>
             
             <Button variant="outline" size="sm" asChild>
-              <Link to="/login">
+              <Link to="/login" className="flex items-center">
                 <LogIn className="h-4 w-4 mr-2" />
                 Sign In
               </Link>
@@ -184,7 +184,7 @@ export default function GuestCalculator() {
             </div>
 
             {/* Items Section */}
-            <div className="space-y-4">
+            <div className="space-y-3">
               <Label>Items you owe</Label>
               <div className="space-y-3">
                 {items.map((item, index) => (

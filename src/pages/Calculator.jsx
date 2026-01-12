@@ -249,7 +249,7 @@ export default function Calculator() {
             </div>
 
             {/* Items Section */}
-            <div className="space-y-4">
+            <div className="space-y-3">
               <Label>Items you owe</Label>
               <div className="space-y-3">
                 {items.map((item, index) => (
